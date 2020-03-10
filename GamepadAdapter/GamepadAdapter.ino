@@ -5,9 +5,9 @@ const int NES_LATCH;
 const int NES_CLK;
 const int NES_DATA;
 
-const int SNES_LATCH;
-const int SNES_CLK;
-const int SNES_DATA;
+const int SNES_LATCH = 3;
+const int SNES_CLK = 2;
+const int SNES_DATA = 4;
 
 typedef struct {
   bool up;
@@ -79,7 +79,7 @@ NesGamepadState getNesGamepadState() {
 SnesGamepadState getSnesGamepadState() {
   SnesGamepadState state;
   tickHigh(SNES_LATCH);
-  
+
   state.b = digitalRead(SNES_DATA) == LOW;
   tickLow(SNES_CLK);
   state.y = digitalRead(SNES_DATA) == LOW;
@@ -107,15 +107,23 @@ SnesGamepadState getSnesGamepadState() {
   return state;
 }
 
+bool isStateSame(SnesGamepadState first, SnesGamepadState second) {
+  if (first.up != second.up || first.down != second.down || first.left != second.left || first.right != second.right ||
+    first.a != second.a || first.b != second.b || first.x != second.x || first.y != second.y ||
+    first.l != second.l || first.r != second.r || first.start != second.start || first.select != second.select) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
 void tickHigh(int pin) {
   digitalWrite(pin, HIGH);
-  delayMicroseconds(1);
   digitalWrite(pin, LOW);
 }
 
 void tickLow(int pin) {
   digitalWrite(pin, LOW);
-  delayMicroseconds(1);
   digitalWrite(pin, HIGH);
 }
 
@@ -142,26 +150,29 @@ char *descriptionForState(SnesGamepadState state) {
   strcat(buffer, state.right ? "RIGHT, " : "right, ");
   strcat(buffer, state.a ? "A, " : "a, ");
   strcat(buffer, state.b ? "B, " : "b, ");
-  strcat(buffer, state.a ? "X, " : "x, ");
-  strcat(buffer, state.b ? "Y, " : "y, ");
-  strcat(buffer, state.a ? "L, " : "l, ");
-  strcat(buffer, state.b ? "R, " : "r, ");
+  strcat(buffer, state.x ? "X, " : "x, ");
+  strcat(buffer, state.y ? "Y, " : "y, ");
+  strcat(buffer, state.l ? "L, " : "l, ");
+  strcat(buffer, state.r ? "R, " : "r, ");
   strcat(buffer, state.start ? "START, " : "start, ");
   strcat(buffer, state.select ? "SELECT" : "select");
   return buffer;
 }
 
 void setup() {
-  //startNesGamepad();
   startSnesGamepad();
   Serial.begin(9600);
 }
 
+SnesGamepadState oldState;
 void loop() {
-  //NesGamepadState state = getNesGamepadState();
   SnesGamepadState state = getSnesGamepadState();
-  char *description = descriptionForState(state);
-  Serial.println(description);
-  free(description);
-  delay(100);
+  if (!isStateSame(state, oldState)) {
+    oldState = state;
+    char *description = descriptionForState(state);
+    Serial.println(description);
+    free(description);
+  }
+  
+  delay(10);
 }
