@@ -14,6 +14,11 @@ SRC          = Joystick.c \
 			   $(LUFA_SRC_USB) \
 			   $(LUFA_SRC_USBCLASS)
 
+# We also want to remove obj directory
+clean: deepClean
+deepClean:
+	rm -rf obj
+
 # Default target
 all:
 
