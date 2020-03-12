@@ -158,9 +158,9 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
                                          void* ReportData,
                                          uint16_t* const ReportSize)
 {
-	/*USB_JoystickReport_Data_t* JoystickReport = (USB_JoystickReport_Data_t*)ReportData;
+	USB_JoystickReport_Data_t* JoystickReport = (USB_JoystickReport_Data_t*)ReportData;
 
-	uint8_t JoyStatus_LCL    = Joystick_GetStatus();
+	/*uint8_t JoyStatus_LCL    = Joystick_GetStatus();
 	uint8_t ButtonStatus_LCL = Buttons_GetStatus();
 
 	if (JoyStatus_LCL & JOY_UP)
@@ -177,9 +177,9 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
 	  JoystickReport->Button |= (1 << 1);
 
 	if (ButtonStatus_LCL & BUTTONS_BUTTON1)
-	  JoystickReport->Button |= (1 << 0);
+	  JoystickReport->Button |= (1 << 0);*/
 
-	*ReportSize = sizeof(USB_JoystickReport_Data_t);*/
+	*ReportSize = sizeof(USB_JoystickReport_Data_t);
 	return false;
 }
 

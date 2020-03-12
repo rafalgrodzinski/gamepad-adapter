@@ -73,7 +73,7 @@ const USB_Descriptor_Device_t PROGMEM DeviceDescriptor =
 
 	.VendorID               = 0x03EB,
 	.ProductID              = 0x2043,
-	.ReleaseNumber          = VERSION_BCD(0,0,1),
+	.ReleaseNumber          = VERSION_BCD(0,0,9),
 
 	.ManufacturerStrIndex   = STRING_ID_Manufacturer,
 	.ProductStrIndex        = STRING_ID_Product,
@@ -158,7 +158,7 @@ const USB_Descriptor_String_t PROGMEM ManufacturerString = USB_STRING_DESCRIPTOR
  *  and is read out upon request by the host when the appropriate string ID is requested, listed in the Device
  *  Descriptor.
  */
-const USB_Descriptor_String_t PROGMEM ProductString = USB_STRING_DESCRIPTOR(L"LUFA Joystick Demo");
+const USB_Descriptor_String_t PROGMEM ProductString = USB_STRING_DESCRIPTOR(L"LUFA Joystick Demo9");
 
 /** This function is called by the library when in device mode, and must be overridden (see library "USB Descriptors"
  *  documentation) by the application code so that the address and size of a requested descriptor can be given
