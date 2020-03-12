@@ -1,3 +1,13 @@
+# hid-joystick
+Firmware/hid-joystick/*.bin
+Firmware/hid-joystick/*.eep
+Firmware/hid-joystick/*.elf
+Firmware/hid-joystick/*.hex
+Firmware/hid-joystick/*.lss
+Firmware/hid-joystick/*.map
+Firmware/hid-joystick/*.sym
+Firmware/hid-joystick/obj
+
 # macOS
 .DS_Store
 
