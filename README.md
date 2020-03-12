@@ -25,3 +25,10 @@ Buttons are received in the following order:
 * X
 * L
 * R
+
+## HID Joystick Firmware
+The `hid-joystick` contains firmware for the ATMega16U2 microcontroller contained on the Arduino Uno board, which enables it to behave as a HID Joystick. The main microcontroller, the ATMega328P, reads input from a gamepad, passes it over to the 16U2, which then sends it over to the host as a HID Joystick input.
+
+The USB stack is provided by the LUFA library.
+
+In order to build the `hid-joystick`, you need to have `avr-gcc` and `avr-libc` installed on your system. Once that's done, go to `Firmware/hid-joystick` and run `make`. That will spit out `hid-joystick.hex`, which can be used to flash the 16U2.
