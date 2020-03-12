@@ -173,6 +173,4 @@ void loop() {
     Serial.println(description);
     free(description);
   }
-  
-  delay(10);
 }
