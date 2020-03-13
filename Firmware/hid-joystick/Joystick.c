@@ -37,22 +37,18 @@ static uint8_t PrevJoystickHIDReportBuffer[sizeof(GamepadState)];
  *  passed to all HID Class driver functions, so that multiple instances of the same class
  *  within a device can be differentiated from one another.
  */
-USB_ClassInfo_HID_Device_t Joystick_HID_Interface =
-	{
-		.Config =
-			{
-				.InterfaceNumber              = INTERFACE_ID_Joystick,
-				.ReportINEndpoint             =
-					{
-						.Address              = JOYSTICK_EPADDR,
-						.Size                 = JOYSTICK_EPSIZE,
-						.Banks                = 1,
+USB_ClassInfo_HID_Device_t Joystick_HID_Interface = {
+		.Config = {
+				.InterfaceNumber = INTERFACE_ID_Joystick,
+				.ReportINEndpoint = {
+						.Address = JOYSTICK_EPADDR,
+						.Size = JOYSTICK_EPSIZE,
+						.Banks = 1,
 					},
-				.PrevReportINBuffer           = PrevJoystickHIDReportBuffer,
-				.PrevReportINBufferSize       = sizeof(PrevJoystickHIDReportBuffer),
-			},
-	};
-
+				.PrevReportINBuffer = PrevJoystickHIDReportBuffer,
+				.PrevReportINBufferSize = sizeof(PrevJoystickHIDReportBuffer),
+		},
+};
 
 uint8_t data[2];
 uint8_t dataCounter;
@@ -61,11 +57,11 @@ int main(void) {
 	SetupHardware();
 	GlobalInterruptEnable();
 
-	for (;;)
-	{
+	for (;;) {
 		HID_Device_USBTask(&Joystick_HID_Interface);
 		USB_USBTask();
 
+        // Read data on serial connection from the main MCU
         if (Serial_IsCharReceived()) {
             LEDs_TurnOnLEDs(LEDS_LED1);
 
@@ -77,8 +73,7 @@ int main(void) {
 	}
 }
 
-void SetupHardware(void)
-{
+void SetupHardware(void) {
 	/* Disable watchdog if enabled by bootloader/fuses */
 	MCUSR &= ~(1 << WDRF);
 	wdt_disable();
@@ -88,7 +83,7 @@ void SetupHardware(void)
 
 	/* Hardware Initialization */
 	LEDs_Init();
-    Serial_Init(9600, true);
+    Serial_Init(115200, true);
 	USB_Init();
 }
 
@@ -100,10 +95,7 @@ void EVENT_USB_Device_Disconnect(void) {
 }
 
 void EVENT_USB_Device_ConfigurationChanged(void) {
-	bool ConfigSuccess = true;
-
-	ConfigSuccess &= HID_Device_ConfigureEndpoints(&Joystick_HID_Interface);
-
+	HID_Device_ConfigureEndpoints(&Joystick_HID_Interface);
 	USB_Device_EnableSOFEvents();
 }
 
@@ -117,12 +109,13 @@ void EVENT_USB_Device_StartOfFrame(void) {
 
 bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t *const HIDInterfaceInfo, uint8_t *const ReportID,
                                          const uint8_t ReportType, void *ReportData, uint16_t *const ReportSize) {
+    // Wait for the two values to be filled in
     if (dataCounter != 2)
         return false;
 
     GamepadState *state = (GamepadState *)ReportData;
-    state->direction = data[1];
-    state->buttons = data[0];
+    state->direction = data[0];
+    state->buttons = data[1];
 	*ReportSize = sizeof(GamepadState);
 
     LEDs_TurnOffLEDs(LEDS_LED1);
