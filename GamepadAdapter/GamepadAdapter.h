@@ -2,7 +2,7 @@
 const int SNES_LATCH = 3;
 const int SNES_CLK = 2;
 const int SNES_DATA = 4;
-const unsigned long debounceDuration = 40;
+const unsigned long debounceDuration = 32;
 
 // Types
 typedef int bool;
