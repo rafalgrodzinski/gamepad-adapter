@@ -159,6 +159,41 @@ char *descriptionForState(SnesGamepadState state) {
   return buffer;
 }
 
+uint8_t encodedButtonsStateForState(SnesGamepadState state) {
+  uint8_t buttons = 0;
+  buttons |= state.y << 0;
+  buttons |= state.b << 1;
+  buttons |= state.a << 2;
+  buttons |= state.x << 3;
+  buttons |= state.l << 4;
+  buttons |= state.r << 5;
+  buttons |= state.select << 6;
+  buttons |= state.start << 7;
+  return buttons;
+}
+
+uint8_t encodedDirectionForState(SnesGamepadState state) {
+  if (state.up && !state.right && !state.down && !state.left) {
+    return 1;
+  } else if (state.up && state.right && !state.down && !state.left) {
+    return 2;
+  } else if (!state.up && state.right && !state.down && !state.left) {
+    return 3;
+  } else if (!state.up && state.right && state.down && !state.left) {
+    return 4;
+  } else if (!state.up && !state.right && state.down && !state.left) {
+    return 5;
+  } else if (!state.up && !state.right && state.down && state.left) {
+    return 6;
+  } else if (!state.up && !state.right && !state.down && state.left) {
+    return 7;
+  } else if (state.up && !state.right && !state.down && state.left) {
+    return 8;
+  } else {
+    return 0;
+  }
+}
+
 void setup() {
   startSnesGamepad();
   Serial.begin(9600);
@@ -169,8 +204,19 @@ void loop() {
   SnesGamepadState state = getSnesGamepadState();
   if (!isStateSame(state, oldState)) {
     oldState = state;
-    char *description = descriptionForState(state);
-    Serial.println(description);
-    free(description);
+    //char *description = descriptionForState(state);
+    //Serial.println(description);
+    //free(description);
+    uint8_t buttonsState = encodedButtonsStateForState(state);
+    uint8_t directionState = encodedDirectionForState(state);
+    Serial.write(buttonsState);
+    Serial.write(directionState);
+    /*char snum[10];
+    itoa(buttonsState, snum, 10);
+    Serial.write(snum);
+    itoa(directionState, snum, 10);
+    Serial.print(" | ");
+    Serial.write(snum);
+    Serial.println();*/
   }
 }
