@@ -14,13 +14,13 @@ SRC          = Joystick.c \
 			   $(LUFA_SRC_USB) \
 			   $(LUFA_SRC_USBCLASS)
 
+# Default target
+all:
+
 # We also want to remove obj directory
 clean: deepClean
 deepClean:
 	rm -rf obj
-
-# Default target
-all:
 
 # Include LUFA-specific DMBS extension modules
 DMBS_LUFA_PATH = $(LUFA_PATH)/Build/LUFA
