@@ -1,8 +1,14 @@
 // Config
+const unsigned long debounceDuration = 32;
+
 const int SNES_LATCH = 3;
 const int SNES_CLK = 2;
 const int SNES_DATA = 4;
-const unsigned long debounceDuration = 32;
+
+const int DS_DATA = 2;
+const int DS_CMD = 3;
+const int DS_ATT = 4;
+const int DS_CLK = 5;
 
 // Types
 typedef int bool;
@@ -28,6 +34,23 @@ typedef struct {
   DebouncedInput select;
 } SnesGamepadState;
 
+typedef struct {
+  bool up;
+  bool down;
+  bool left;
+  bool right;
+  bool circle;
+  bool cross;
+  bool square;
+  bool triangle;
+  bool l1;
+  bool l2;
+  bool r1;
+  bool r2;
+  bool start;
+  bool select;
+} DualShockState;
+
 // General Functions
 void tickHigh(int pin);
 void tickLow(int pin);
@@ -35,8 +58,14 @@ void debounceAndUpdateInput(DebouncedInput *input, bool newState);
 
 // SNES
 void startSnesGamepad();
-void updateSnesGamepadState(SnesGamepadState *state);
+void updateState(SnesGamepadState *state);
 bool isStateIdentical(SnesGamepadState *first, SnesGamepadState *second);
 uint8_t encodedDirectionForState(SnesGamepadState *state);
 uint8_t encodedButtonsStateForState(SnesGamepadState *state);
-char printDescriptionForState(SnesGamepadState *state);
+void printDescriptionForState(SnesGamepadState *state);
+
+// DualShock
+void startDualShock();
+void updateState(DualShockState *state);
+bool isStateIdentical(DualShockState *first, DualShockState *second);
+void printDescriptionForState(DualShockState *state);
