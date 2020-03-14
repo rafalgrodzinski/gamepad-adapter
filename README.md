@@ -6,11 +6,12 @@ This is an Arduino based adapter for a number of different gamepads.
 * SNES
 
 ## SNES Gamepad
-SNES gamepad is almost identical to a NES gamepad, with the difference of having 12 buttons instead of 8. It also has +5V, Gnd, `LATCH`, `DATA`, and `CLOCK` lines. The remaining two pins on the plug remain unused.
+SNES gamepad is almost identical to a NES gamepad, with the difference of having 12 buttons instead of 8 and a diffepern plug shape. It has 7 pins: Vcc +5V, Gnd, Latch, Date, and `CLOCK`. The remaining two pins are unused (at least in the gamepad case).
+![SNES Gamepad Pinout](pinout.jpg)
 
-Eletronics of the gamepad consist of a single V520B IC, which is a 16-bit shift register. Gamepad receives a `LATCH` signal (active high), which causes state of the buttons to be stored. state of the first button is then available on the `DATA` line. `CLOCK` (active low) is sent multiple times, which causes subsequent states to be available. There are 12 buttons, so the remaining 4 bits remain unused. Button signal is low when active.
+Eletronics of the gamepad consist of a single V520B IC, which is a 16-bit shift register. Gamepad receives a `LATCH` signal (active high), which causes state of the buttons to be stored. State of the first button becomes then available on the `DATA` line. `CLOCK` (active low) is sent multiple times, which causes subsequent states to be available. There are 12 buttons, so the remaining 4 bits remain unused. When button is pressed, it's corresponding signal is low.
 
-Buttons are received in the following order:
+State of buttons is received in the following order:
 
 * B
 * Y
