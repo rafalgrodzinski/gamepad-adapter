@@ -260,6 +260,71 @@ bool isStateIdentical(DualShockState *first, DualShockState *second) {
   }
 }
 
+uint8_t encodeState(DualShockState *state, uint8_t **data) {
+  *data = malloc(sizeof(uint8_t) * 7);
+
+  // Direction
+  bool up = state->up;
+  bool right = state->right;
+  bool down = state->down;
+  bool left = state->left;
+  // Up
+  if (up && !right && !down && !left) {
+    (*data)[0] = 1;
+  // Up Right
+  } else if (up && right && !down && !left) {
+    (*data)[0] = 2;
+  // Right
+  } else if (!up && right && !down && !left) {
+    (*data)[0] = 3;
+  // Right Down
+  } else if (!up && right && down && !left) {
+    (*data)[0] = 4;
+  // Down
+  } else if (!up && !right && down && !left) {
+    (*data)[0] = 5;
+  // Down Left
+  } else if (!up && !right && down && left) {
+    (*data)[0] = 6;
+  // Left
+  } else if (!up && !right && !down && left) {
+    (*data)[0] = 7;
+  // Left Up
+  } else if (up && !right && !down && left) {
+    (*data)[0] = 8;
+  } else {
+    (*data)[0] = 0;
+  }
+
+  // Buttons 1
+  (*data)[1] = 0;
+  (*data)[1] |= state->circle   << 0;
+  (*data)[1] |= state->cross    << 1;
+  (*data)[1] |= state->triangle << 2;
+  (*data)[1] |= state->square   << 3;
+  (*data)[1] |= state->l1       << 4;
+  (*data)[1] |= state->l2       << 5;
+  (*data)[1] |= state->r1       << 6;
+  (*data)[1] |= state->r2       << 7;
+
+  // Buttons 2
+  (*data)[2] = 0;
+  (*data)[2] |= state->start  << 0;
+  (*data)[2] |= state->select << 1;
+  (*data)[2] |= state->l3     << 2;
+  (*data)[2] |= state->r3     << 3;
+
+  // Left Stick
+  (*data)[3] = state->lx;
+  (*data)[4] = state->ly;
+ 
+  // Right Stick
+  (*data)[5] = state->rx;
+  (*data)[6] = state->ry;
+
+  return 7;
+}
+
 void printDescriptionForState(DualShockState *state) {
   Serial.print(state->lx);
   Serial.print(" | ");
@@ -316,10 +381,16 @@ void loop() {
   updateState(&state);
   if (!isStateIdentical(&state, &oldState)) {
     oldState = state;
-    /*uint8_t directionState = encodedDirectionForState(&state);
-    uint8_t buttonsState = encodedButtonsStateForState(&state);
-    Serial.write(directionState);
-    Serial.write(buttonsState);*/
-    printDescriptionForState(&state);
+    uint8_t *data;
+    uint8_t dataCount = encodeState(&state, &data);
+    for(int i=0; i < dataCount; i++) {
+      Serial.write(data[i]);
+      /*Serial.print(data[i], BIN);
+      if (i < dataCount - 1)
+        Serial.print(" | ");*/
+    }
+    Serial.println();
+    free(data);
+    //printDescriptionForState(&state);
   }
 }

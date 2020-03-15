@@ -35,10 +35,10 @@ typedef struct {
 } SnesGamepadState;
 
 typedef struct {
-  int8_t lx;
-  int8_t ly;
-  int8_t rx;
-  int8_t ry;
+  uint8_t lx;
+  uint8_t ly;
+  uint8_t rx;
+  uint8_t ry;
   bool up;
   bool down;
   bool left;
@@ -74,4 +74,5 @@ void printDescriptionForState(SnesGamepadState *state);
 void startDualShock();
 void updateState(DualShockState *state);
 bool isStateIdentical(DualShockState *first, DualShockState *second);
+uint8_t encodeState(DualShockState *state, uint8_t **data);
 void printDescriptionForState(DualShockState *state);
