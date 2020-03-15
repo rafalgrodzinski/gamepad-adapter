@@ -35,6 +35,10 @@ typedef struct {
 } SnesGamepadState;
 
 typedef struct {
+  int8_t lx;
+  int8_t ly;
+  int8_t rx;
+  int8_t ry;
   bool up;
   bool down;
   bool left;
@@ -45,8 +49,10 @@ typedef struct {
   bool triangle;
   bool l1;
   bool l2;
+  bool l3;
   bool r1;
   bool r2;
+  bool r3;
   bool start;
   bool select;
 } DualShockState;

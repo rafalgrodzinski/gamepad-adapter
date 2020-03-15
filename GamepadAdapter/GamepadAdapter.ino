@@ -193,33 +193,66 @@ void startDualShock() {
 void updateState(DualShockState *state) {
   digitalWrite(DS_ATT, LOW);
   exchangeBytes(0x01, DS_CMD, DS_DATA, DS_CLK);
-  exchangeBytes(0x42, DS_CMD, DS_DATA, DS_CLK);
+  uint8_t mode = exchangeBytes(0x42, DS_CMD, DS_DATA, DS_CLK);
   receiveByte(DS_DATA, DS_CLK);
-  uint8_t first = ~receiveByte(DS_DATA, DS_CLK);
-  uint8_t second = ~receiveByte(DS_DATA, DS_CLK);
+  uint8_t data1 = ~receiveByte(DS_DATA, DS_CLK);
+  uint8_t data2 = ~receiveByte(DS_DATA, DS_CLK);
+  uint8_t data3;
+  uint8_t data4;
+  uint8_t data5;
+  uint8_t data6;
+  // 0x73 is Analog mode and the data has to be read straighth away
+  if(mode == 0x73) {
+    data3 = receiveByte(DS_DATA, DS_CLK);
+    data4 = ~receiveByte(DS_DATA, DS_CLK);
+    data5 = receiveByte(DS_DATA, DS_CLK);
+    data6 = ~receiveByte(DS_DATA, DS_CLK);
+  }
   digitalWrite(DS_ATT, HIGH);
 
-  state->select = (first >> 0) & 0x01;
-  state->start  = (first >> 3) & 0x01;
-  state->up     = (first >> 4) & 0x01;
-  state->right  = (first >> 5) & 0x01;
-  state->down   = (first >> 6) & 0x01;
-  state->left   = (first >> 7) & 0x01;
+  state->select = (data1 >> 0) & 0x01;
+  state->start  = (data1 >> 3) & 0x01;
+  state->up     = (data1 >> 4) & 0x01;
+  state->right  = (data1 >> 5) & 0x01;
+  state->down   = (data1 >> 6) & 0x01;
+  state->left   = (data1 >> 7) & 0x01;
 
-  state->l2       = (second >> 0) & 0x01;
-  state->r2       = (second >> 1) & 0x01;
-  state->l1       = (second >> 2) & 0x01;
-  state->r1       = (second >> 3) & 0x01;
-  state->triangle = (second >> 4) & 0x01;
-  state->circle   = (second >> 5) & 0x01;
-  state->cross    = (second >> 6) & 0x01;
-  state->square   = (second >> 7) & 0x01;
+  state->l2       = (data2 >> 0) & 0x01;
+  state->r2       = (data2 >> 1) & 0x01;
+  state->l1       = (data2 >> 2) & 0x01;
+  state->r1       = (data2 >> 3) & 0x01;
+  state->triangle = (data2 >> 4) & 0x01;
+  state->circle   = (data2 >> 5) & 0x01;
+  state->cross    = (data2 >> 6) & 0x01;
+  state->square   = (data2 >> 7) & 0x01;
+
+  // 0x73 is analog mode
+  if (mode == 0x73) {
+    state->l3 = (data1 >> 1) & 0x01;
+    state->r3 = (data1 >> 2) & 0x01;
+
+    state->rx = data3 - 0x80;
+    state->ry = data4 - 0x80;
+
+    state->lx = data5 - 0x80;
+    state->ly = data6 - 0x80;
+  // We're in digital mode (0x41), so reset everything to  default
+  } else {
+    state->l3 = false;
+    state->r3 = false;
+    state->lx = 0;
+    state->ly = 0;
+    state->rx = 0;
+    state->ry = 0;
+  }
 }
 
 bool isStateIdentical(DualShockState *first, DualShockState *second) {
-  if (first->up != second->up || first->down != second->down || first->left != second->left || first->right != second->right ||
+  if (first->rx != second->rx || first->ry != second->ry || first->lx != second->lx || first->ly != second->ly ||
+    first->up != second->up || first->down != second->down || first->left != second->left || first->right != second->right ||
     first->circle != second->circle || first->cross != second->cross || first->triangle != second->triangle || first->square != second->square ||
-    first->l1 != second->l1 || first->l2 != second->l2 || first->r1 != second->r1 || first->r2 != second->r2 ||
+    first->l1 != second->l1 || first->l2 != second->l2 || first->l3 != second->l3 ||
+    first->r1 != second->r1 || first->r2 != second->r2 || first->r3 != second->r3 ||
     first->start != second->start || first->select != second->select) {
     return false;
   } else {
@@ -228,6 +261,14 @@ bool isStateIdentical(DualShockState *first, DualShockState *second) {
 }
 
 void printDescriptionForState(DualShockState *state) {
+  Serial.print(state->lx);
+  Serial.print(" | ");
+  Serial.print(state->ly);
+  Serial.print(", ");
+  Serial.print(state->rx);
+  Serial.print(" | ");
+  Serial.print(state->ry);
+  Serial.print(", ");
   Serial.print(state->up ? "UP, " : "up, ");
   Serial.print(state->down ? "DOWN, " : "down, ");
   Serial.print(state->left ? "LEFT, " : "left, ");
@@ -238,8 +279,10 @@ void printDescriptionForState(DualShockState *state) {
   Serial.print(state->square ? "S, " : "s, ");
   Serial.print(state->l1 ? "L1, " : "l1, ");
   Serial.print(state->l2 ? "L2, " : "l2, ");
+  Serial.print(state->l3 ? "L3, " : "l3, ");
   Serial.print(state->r1 ? "R1, " : "r1, ");
   Serial.print(state->r2 ? "R2, " : "r2, ");
+  Serial.print(state->r3 ? "R3, " : "r3, ");
   Serial.print(state->start ? "START, " : "start, ");
   Serial.print(state->select ? "SELECT" : "select");
   Serial.println();

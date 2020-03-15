@@ -42,3 +42,4 @@ In order to build the `hid-joystick`, you need to have `avr-gcc` and `avr-libc` 
 ## References
 * HID Usage Tables - [https://usb.org/document-library/hid-usage-tables-112](https://usb.org/document-library/hid-usage-tables-112)
 * USB Complete Guide (Jan Axelson)
+* PSX Controller Information - [https://gamesx.com/controldata/psxcont/psxcont.htm](https://gamesx.com/controldata/psxcont/psxcont.htm)
