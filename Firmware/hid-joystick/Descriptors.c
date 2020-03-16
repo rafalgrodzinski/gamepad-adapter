@@ -75,13 +75,27 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM JoystickReport[] =
     0x09, 0x05, // Usage Gamepad
     0xa1, 0x01, // Collection Application
 
-        0x05, 0x01, // Usage Page Generic Desktop
+        /*0x05, 0x01, // Usage Page Generic Desktop
         0x09, 0x39, // Usage Hat Switch
         0x15, 0x01, // Logical Minimum 1
         0x25, 0x08, // Logical Maximum 8
         0x75, 0x08, // Report Size 8
         0x95, 0x01, // Report Count 1
         0x81, 0x02, // Data, Variable, Absolute
+        */
+        0x05, 0x01, // Usage Page Generic Desktop
+        0x09, 0x01, // Usage Pointer
+        0xa1, 0x00, // Collection Physical
+            0x09, 0x90, // Up
+            0x09, 0x91, // Down
+            0x09, 0x92, // Right
+            0x09, 0x93, // Left
+            0x15, 0x00, // Logical Minimum 0
+            0x25, 0x01, // Logical Maximum 1
+            0x75, 0x01, // Report Size 1
+            0x95, 0x04, // Report Count
+            0x81, 0x02, // Data, Variable, Absolute
+        0xc0,
         
         0x05, 0x09, // Usage Page Buttons
         0x19, 0x01, // Usage Minimum 1
