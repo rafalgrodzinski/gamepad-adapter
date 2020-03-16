@@ -31,7 +31,7 @@
 #include "Joystick.h"
 
 /** Buffer to hold the previously generated HID report, for comparison purposes inside the HID class driver. */
-static uint8_t PrevJoystickHIDReportBuffer[sizeof(GamepadState)];
+static uint8_t PrevJoystickHIDReportBuffer[sizeof(DualShockState)];
 
 /** LUFA HID Class driver interface configuration and state information. This structure is
  *  passed to all HID Class driver functions, so that multiple instances of the same class
@@ -50,7 +50,7 @@ USB_ClassInfo_HID_Device_t Joystick_HID_Interface = {
 		},
 };
 
-uint8_t data[2];
+uint8_t data[8];
 uint8_t dataCounter;
 
 int main(void) {
@@ -65,7 +65,7 @@ int main(void) {
         if (Serial_IsCharReceived()) {
             LEDs_TurnOnLEDs(LEDS_LED1);
 
-            if(dataCounter == 2)
+            if(dataCounter == 8)
                 dataCounter = 0;
             data[dataCounter] = Serial_ReceiveByte();
             dataCounter++;
@@ -110,13 +110,19 @@ void EVENT_USB_Device_StartOfFrame(void) {
 bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t *const HIDInterfaceInfo, uint8_t *const ReportID,
                                          const uint8_t ReportType, void *ReportData, uint16_t *const ReportSize) {
     // Wait for the two values to be filled in
-    if (dataCounter != 2)
+    if (dataCounter != 8)
         return false;
 
-    GamepadState *state = (GamepadState *)ReportData;
+    DualShockState *state = (DualShockState *)ReportData;
     state->direction = data[0];
-    state->buttons = data[1];
-	*ReportSize = sizeof(GamepadState);
+    state->buttons[0] = data[1];
+    state->buttons[1] = data[2];
+    // Convert sticks data from 0 to 255 into -128 to 127
+    state->leftStick[0] = data[3] - 0x80;
+    state->leftStick[1] = data[4] - 0x80;
+    state->rightStick[0] = data[5] - 0x80;
+    state->rightStick[1] = data[6] - 0x80;
+	*ReportSize = sizeof(DualShockState);
 
     LEDs_TurnOffLEDs(LEDS_LED1);
 

@@ -43,6 +43,32 @@
  *  the device will send, and what it may be sent back from the host. Refer to the HID specification for
  *  more details on HID report descriptors.
  */
+/*const USB_Descriptor_HIDReport_Datatype_t PROGMEM JoystickReport[] =
+{
+    0x05, 0x01, // Usage Page Generic Desktop
+    0x09, 0x05, // Usage Gamepad
+    0xa1, 0x01, // Collection Application
+
+        0x05, 0x01, // Usage Page Generic Desktop
+        0x09, 0x39, // Usage Hat Switch
+        0x15, 0x01, // Logical Minimum 1
+        0x25, 0x08, // Logical Maximum 8
+        0x75, 0x08, // Report Size 8
+        0x95, 0x01, // Report Count 1
+        0x81, 0x02, // Data, Variable, Absolute
+        
+        0x05, 0x09, // Usage Page Buttons
+        0x19, 0x01, // Usage Minimum 1
+        0x29, 0x08, // Usage Maximum 8
+        0x15, 0x00, // Logical Minimum 0
+        0x25, 0x01, // Logical Maximum 1
+        0x75, 0x01, // Report Size 1
+        0x95, 0x08, // Report Count 8
+        0x81, 0x02, // Data Variable Absolute
+
+    0xc0 // End Collection
+};
+*/
 const USB_Descriptor_HIDReport_Datatype_t PROGMEM JoystickReport[] =
 {
     0x05, 0x01, // Usage Page Generic Desktop
@@ -57,16 +83,38 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM JoystickReport[] =
         0x95, 0x01, // Report Count 1
         0x81, 0x02, // Data, Variable, Absolute
         
-
-        
         0x05, 0x09, // Usage Page Buttons
-        0x19, 0x01, // Usage Minimum 0
-        0x29, 0x08, // Usage Maximum 7
+        0x19, 0x01, // Usage Minimum 1
+        0x29, 0x0c, // Usage Maximum 12 (12 buttons)
         0x15, 0x00, // Logical Minimum 0
         0x25, 0x01, // Logical Maximum 1
-        0x75, 0x01, // Report Size 8
-        0x95, 0x08, // Report Count 1
+        0x75, 0x01, // Report Size 1
+        0x95, 0x10, // Report Count 16 (16 bits of data for buttons)
         0x81, 0x02, // Data Variable Absolute
+
+        0x05, 0x01, // Usage Page Generic Desktop
+        0x09, 0x01, // Usage Pointer
+        0xa1, 0x00, // Collection Physical
+            0x09, 0x30, // Usage X
+            0x09, 0x31, // Usage Y
+            0x15, 0x80, // Logical Minimum -128
+            0x25, 0x7f, // Logical Maximum 127
+            0x75, 0x08, // Report Size 8
+            0x95, 0x02, // Report Count 2
+            0x81, 0x82, // Data, Variable, Absolute, Volatile 
+        0xc0, // End Collection
+
+        0x05, 0x01, // Usage Page Generic Desktop
+        0x09, 0x01, // Usage Pointer
+        0xa1, 0x00, // Collection Physical
+            0x09, 0x33, // Usage Rx
+            0x09, 0x34, // Usage Ry
+            0x15, 0x80, // Logical Minimum -128
+            0x25, 0x7f, // Logical Maximum 127
+            0x75, 0x08, // Report Size 8
+            0x95, 0x02, // Report Count 2
+            0x81, 0x82, // Data, Variable, Absolute, Volatile 
+        0xc0, // End Collection
 
     0xc0 // End Collection
 };

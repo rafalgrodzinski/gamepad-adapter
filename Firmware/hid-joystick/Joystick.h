@@ -44,10 +44,17 @@
 #include <LUFA/Platform/Platform.h>
 #include <LUFA/Drivers/Peripheral/Serial.h>
 
-typedef struct {
+/*typedef struct {
     uint8_t direction;
     uint8_t buttons;
-} GamepadState;
+} GamepadState;*/
+
+typedef struct {
+    uint8_t direction;
+    uint8_t buttons[2];
+    int8_t leftStick[2];
+    int8_t rightStick[2];
+} DualShockState;
 
 void SetupHardware(void);
 
