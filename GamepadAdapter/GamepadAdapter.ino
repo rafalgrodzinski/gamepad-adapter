@@ -230,20 +230,31 @@ void updateState(DualShockState *state) {
   if (mode == 0x73) {
     state->l3 = (data1 >> 1) & 0x01;
     state->r3 = (data1 >> 2) & 0x01;
-
     state->rx = data3;
     state->ry = data4;
-
     state->lx = data5;
     state->ly = data6;
+
+    // Add a bit of dead zone
+    const uint8_t deadZoneMin = 0x80 - 0x20;
+    const uint8_t deadZoneMax = 0x80 + 0x20;
+    if (state->lx > deadZoneMin && state->lx < deadZoneMax)
+      state->lx = 0x80;
+    if (state->ly > deadZoneMin && state->ly < deadZoneMax)
+      state->ly = 0x80;
+    if (state->rx > deadZoneMin && state->rx < deadZoneMax)
+      state->rx = 0x80;
+    if (state->ry > deadZoneMin && state->ry < deadZoneMax)
+      state->ry = 0x80;
   // We're in digital mode (0x41), so reset everything to  default
   } else {
     state->l3 = false;
     state->r3 = false;
-    state->lx = 0;
-    state->ly = 0;
-    state->rx = 0;
-    state->ry = 0;
+    // 0x80 is middle between 0x00 and 0xff
+    state->lx = 0x80;
+    state->ly = 0x80;
+    state->rx = 0x80;
+    state->ry = 0x80;
   }
 }
 
@@ -381,12 +392,7 @@ void loop() {
     encodeState(&state, data);
     for(int i=0; i < 8; i++) {
       Serial.write(data[i]);
-      /*Serial.print(data[i], BIN);
-      if (i < 7)
-        Serial.print(" | ");
-      */
     }
-    //Serial.println();
     //printDescriptionForState(&state);
   }
 }
