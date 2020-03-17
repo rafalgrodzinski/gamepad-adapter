@@ -1,5 +1,5 @@
 // Config
-const unsigned long debounceDuration = 32;
+const unsigned long debounceDuration = 16;
 
 const int SNES_LATCH = 3;
 const int SNES_CLK = 2;

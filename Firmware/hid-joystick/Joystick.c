@@ -152,11 +152,34 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t *const HIDIn
         state->direction = data[2];
         state->buttons[0] = data[3];
         state->buttons[1] = data[4];
-        // Convert sticks data from 0 to 255 into -127 to 127
-        state->leftStick[0] = data[5] - 0x80;
-        state->leftStick[1] = data[6] - 0x80;
-        state->rightStick[0] = data[7] - 0x80;
-        state->rightStick[1] = data[8] - 0x80;
+        // Convert sticks data from 0 to 255 into -100 to 100
+        int8_t lx = data[5] - 0x80;
+        if (lx >= 0x1c)
+            lx -= 0x1c;
+        else if (lx <= -0x1c)
+            lx += 0x1c;
+        state->leftStick[0] = lx;
+
+        int8_t ly = data[6] - 0x80;
+        if (ly >= 0x1c)
+            ly -= 0x1c;
+        else if (ly <= -0x1c)
+            ly += 0x1c;
+        state->leftStick[1] = ly;
+
+        int8_t rx = data[7] - 0x80;
+        if (rx >= 0x1c)
+            rx -= 0x1c;
+        else if (rx <= -0x1c)
+            rx += 0x1c;
+        state->rightStick[0] = rx;
+
+        int8_t ry = data[8] - 0x80;
+        if (ry >= 0x1c)
+            ry -= 0x1c;
+        else if (ry <= -0x1c)
+            ry += 0x1c;
+        state->rightStick[1] = ry;
 
         *ReportSize = sizeof(DualShockState);
         return true;

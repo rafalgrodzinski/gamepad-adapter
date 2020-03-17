@@ -235,8 +235,8 @@ void updateState(DualShockState *state) {
     state->ly = data6;
 
     // Add a bit of dead zone
-    const uint8_t deadZoneMin = 0x80 - 0x20;
-    const uint8_t deadZoneMax = 0x80 + 0x20;
+    const uint8_t deadZoneMin = 0x80 - 0x1C;
+    const uint8_t deadZoneMax = 0x80 + 0x1C;
     if (state->lx > deadZoneMin && state->lx < deadZoneMax)
       state->lx = 0x80;
     if (state->ly > deadZoneMin && state->ly < deadZoneMax)
