@@ -113,7 +113,8 @@ bool isStateIdentical(SnesGamepadState *first, SnesGamepadState *second) {
   }
 }
 
-uint8_t encodedDirectionForState(SnesGamepadState *state) {
+void encodeState(SnesGamepadState *state, uint8_t *data) {
+  // Direction
   bool up = state->up.state;
   bool right = state->right.state;
   bool down = state->down.state;
@@ -121,44 +122,42 @@ uint8_t encodedDirectionForState(SnesGamepadState *state) {
  
   // Up
   if (up && !right && !down && !left) {
-    return 1;
+    data[0] = 1;
   // Up Right
   } else if (up && right && !down && !left) {
-    return 2;
+    data[0] = 2;
   // Right
   } else if (!up && right && !down && !left) {
-    return 3;
+    data[0] = 3;
   // Right Down
   } else if (!up && right && down && !left) {
-    return 4;
+    data[0] = 4;
   // Down
   } else if (!up && !right && down && !left) {
-    return 5;
+    data[0] = 5;
   // Down Left
   } else if (!up && !right && down && left) {
-    return 6;
+    data[0] = 6;
   // Left
   } else if (!up && !right && !down && left) {
-    return 7;
+    data[0] = 7;
   // Left Up
   } else if (up && !right && !down && left) {
-    return 8;
+    data[0] = 8;
   } else {
-    return 0;
+    data[0] = 0;
   }
-}
 
-uint8_t encodedButtonsStateForState(SnesGamepadState *state) {
-  uint8_t buttons = 0;
-  buttons |= state->y.state << 0;
-  buttons |= state->b.state << 1;
-  buttons |= state->a.state << 2;
-  buttons |= state->x.state << 3;
-  buttons |= state->l.state << 4;
-  buttons |= state->r.state << 5;
-  buttons |= state->select.state << 6;
-  buttons |= state->start.state << 7;
-  return buttons;
+  // Buttons
+  data[1] = 0;
+  data[1] |= state->a.state << 0;
+  data[1] |= state->b.state << 1;
+  data[1] |= state->x.state << 2;
+  data[1] |= state->y.state << 3;
+  data[1] |= state->l.state << 4;
+  data[1] |= state->r.state << 5;
+  data[1] |= state->start.state << 6;
+  data[1] |= state->select.state << 7;
 }
 
 void printDescriptionForState(SnesGamepadState *state) {
@@ -362,37 +361,39 @@ void printDescriptionForState(DualShockState *state) {
 
 void setup() {
   Serial.begin(115200);
-  //startSnesGamepad();
+  startSnesGamepad();
   startDualShock();
 }
 
-/*SnesGamepadState state;
-SnesGamepadState oldState;
-void loop() {
-  updateSnesGamepadState(&state);
-  if (!isStateIdentical(&state, &oldState)) {
-    oldState = state;
-    uint8_t directionState = encodedDirectionForState(&state);
-    uint8_t buttonsState = encodedButtonsStateForState(&state);
-    Serial.write(directionState);
-    Serial.write(buttonsState);
-    //printDescriptionForState(&state);
-  }
-}*/
+SnesGamepadState snesGamepadState;
+SnesGamepadState snesGamepadOldState;
 
-//SnesGamepadState state;
-//SnesGamepadState oldState;
-DualShockState state;
-DualShockState oldState;
+DualShockState dualShockState;
+DualShockState dualShockOldState;
+
 void loop() {
-  updateState(&state);
-  if (!isStateIdentical(&state, &oldState)) {
-    oldState = state;
-    uint8_t data[8];
-    encodeState(&state, data);
-    for(int i=0; i < 8; i++) {
+  bool shouldSendData = false;
+  // Update SNES Gamepad
+  updateState(&snesGamepadState);
+  if (!isStateIdentical(&snesGamepadState, &snesGamepadOldState)) {
+    snesGamepadOldState = snesGamepadState;
+    shouldSendData = true;
+  }
+  // Update DualShock
+  updateState(&dualShockState);
+  if (!isStateIdentical(&dualShockState, &dualShockOldState)) {
+    dualShockOldState = dualShockState;
+    shouldSendData = true;
+  }
+
+  if (shouldSendData) {
+    uint8_t data[10];
+    encodeState(&snesGamepadState, data);
+    encodeState(&dualShockState, &data[2]);
+    for(int i=0; i < 10; i++) {
       Serial.write(data[i]);
     }
-    //printDescriptionForState(&state);
+    //printDescriptionForState(&dualShockState);
+    //printDescriptionForState(&snesGamepadState);
   }
 }

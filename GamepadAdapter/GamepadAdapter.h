@@ -5,10 +5,10 @@ const int SNES_LATCH = 3;
 const int SNES_CLK = 2;
 const int SNES_DATA = 4;
 
-const int DS_DATA = 2;
-const int DS_CMD = 3;
-const int DS_ATT = 4;
-const int DS_CLK = 5;
+const int DS_DATA = A5;
+const int DS_CMD = A4;
+const int DS_ATT = A3;
+const int DS_CLK = A2;
 
 // Types
 typedef int bool;
@@ -66,13 +66,12 @@ void debounceAndUpdateInput(DebouncedInput *input, bool newState);
 void startSnesGamepad();
 void updateState(SnesGamepadState *state);
 bool isStateIdentical(SnesGamepadState *first, SnesGamepadState *second);
-uint8_t encodedDirectionForState(SnesGamepadState *state);
-uint8_t encodedButtonsStateForState(SnesGamepadState *state);
+void encodeState(SnesGamepadState *state, uint8_t *data);
 void printDescriptionForState(SnesGamepadState *state);
 
 // DualShock
 void startDualShock();
 void updateState(DualShockState *state);
 bool isStateIdentical(DualShockState *first, DualShockState *second);
-uint8_t encodeState(DualShockState *state, uint8_t **data);
+void encodeState(DualShockState *state, uint8_t *data);
 void printDescriptionForState(DualShockState *state);
