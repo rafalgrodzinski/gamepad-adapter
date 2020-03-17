@@ -44,10 +44,10 @@
 #include <LUFA/Platform/Platform.h>
 #include <LUFA/Drivers/Peripheral/Serial.h>
 
-/*typedef struct {
+typedef struct {
     uint8_t direction;
     uint8_t buttons;
-} GamepadState;*/
+} SnesGamepadState;
 
 typedef struct {
     uint8_t direction;

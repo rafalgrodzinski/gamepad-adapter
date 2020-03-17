@@ -50,7 +50,8 @@ USB_ClassInfo_HID_Device_t Joystick_HID_Interface = {
 		},
 };
 
-uint8_t data[8];
+// 2 SNES Gamepad bytes, 7 DualShock bytes, 1 byte of padding
+uint8_t data[10];
 uint8_t dataCounter;
 
 int main(void) {
@@ -65,7 +66,7 @@ int main(void) {
         if (Serial_IsCharReceived()) {
             LEDs_TurnOnLEDs(LEDS_LED1);
 
-            if(dataCounter == 8)
+            if(dataCounter == 10)
                 dataCounter = 0;
             data[dataCounter] = Serial_ReceiveByte();
             dataCounter++;
@@ -107,26 +108,61 @@ void EVENT_USB_Device_StartOfFrame(void) {
 	HID_Device_MillisecondElapsed(&Joystick_HID_Interface);
 }
 
+/** HID class driver callback function for the processing of HID reports from the host.
+ *
+ *  \param[in] HIDInterfaceInfo  Pointer to the HID class interface configuration structure being referenced
+ *  \param[in] ReportID    Report ID of the received report from the host
+ *  \param[in] ReportType  The type of report that the host has sent, either REPORT_ITEM_TYPE_Out or REPORT_ITEM_TYPE_Feature
+ *  \param[in] ReportData  Pointer to a buffer where the created report has been stored
+ *  \param[in] ReportSize  Size in bytes of the received HID report
+ */
+uint8_t lastReportId = 0;
 bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t *const HIDInterfaceInfo, uint8_t *const ReportID,
                                          const uint8_t ReportType, void *ReportData, uint16_t *const ReportSize) {
     // Wait for the two values to be filled in
-    if (dataCounter != 8)
+    if (dataCounter != 10)
         return false;
-
-    DualShockState *state = (DualShockState *)ReportData;
-    state->direction = data[0];
-    state->buttons[0] = data[1];
-    state->buttons[1] = data[2];
-    // Convert sticks data from 0 to 255 into -128 to 127
-    state->leftStick[0] = data[3] - 0x80;
-    state->leftStick[1] = data[4] - 0x80;
-    state->rightStick[0] = data[5] - 0x80;
-    state->rightStick[1] = data[6] - 0x80;
-	*ReportSize = sizeof(DualShockState);
 
     LEDs_TurnOffLEDs(LEDS_LED1);
 
-	return true;
+    // Seems that we don't receive ReportID, so let's alternate between the two
+    if (*ReportID == 0) {
+        if (lastReportId == 0x01)
+            lastReportId = 0x02;
+        else
+            lastReportId = 0x01;
+        *ReportID = lastReportId;
+    } else {
+        lastReportId = *ReportID;
+    }
+
+    // SNES Gamepad
+    if (*ReportID == 0x01) {
+        SnesGamepadState *state = (SnesGamepadState *)ReportData;
+
+        state->direction = data[0];
+        state->buttons = data[1];
+
+        *ReportSize = sizeof(SnesGamepadState);
+        return true;
+    // DualShock
+    } else if (*ReportID == 0x02) {
+        DualShockState *state = (DualShockState *)ReportData;
+
+        state->direction = data[2];
+        state->buttons[0] = data[3];
+        state->buttons[1] = data[4];
+        // Convert sticks data from 0 to 255 into -127 to 127
+        state->leftStick[0] = data[5] - 0x80;
+        state->leftStick[1] = data[6] - 0x80;
+        state->rightStick[0] = data[7] - 0x80;
+        state->rightStick[1] = data[8] - 0x80;
+
+        *ReportSize = sizeof(DualShockState);
+        return true;
+    }
+
+	return false;
 }
 
 void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDInterfaceInfo, const uint8_t ReportID,

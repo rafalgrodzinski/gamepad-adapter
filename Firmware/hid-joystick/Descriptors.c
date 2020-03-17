@@ -28,26 +28,14 @@
   this software.
 */
 
-/** \file
- *
- *  USB Device Descriptors, for library use when in USB device mode. Descriptors are special
- *  computer-readable structures which the host requests upon device enumeration, to determine
- *  the device's capabilities and functions.
- */
-
 #include "Descriptors.h"
 
-/** HID class report descriptor. This is a special descriptor constructed with values from the
- *  USBIF HID class specification to describe the reports and capabilities of the HID device. This
- *  descriptor is parsed by the host and its contents used to determine what data (and in what encoding)
- *  the device will send, and what it may be sent back from the host. Refer to the HID specification for
- *  more details on HID report descriptors.
- */
-/*const USB_Descriptor_HIDReport_Datatype_t PROGMEM JoystickReport[] =
-{
+const USB_Descriptor_HIDReport_Datatype_t PROGMEM JoystickReport[] = {
+    // SNES Gamepad
     0x05, 0x01, // Usage Page Generic Desktop
     0x09, 0x05, // Usage Gamepad
     0xa1, 0x01, // Collection Application
+        0x85, 0x01,// Report ID 1
 
         0x05, 0x01, // Usage Page Generic Desktop
         0x09, 0x39, // Usage Hat Switch
@@ -66,14 +54,13 @@
         0x95, 0x08, // Report Count 8
         0x81, 0x02, // Data Variable Absolute
 
-    0xc0 // End Collection
-};
-*/
-const USB_Descriptor_HIDReport_Datatype_t PROGMEM JoystickReport[] =
-{
+    0xc0, // End Collection
+
+    // DualShock
     0x05, 0x01, // Usage Page Generic Desktop
     0x09, 0x05, // Usage Gamepad
     0xa1, 0x01, // Collection Application
+        0x85, 0x02,// Report ID 2
 
         0x05, 0x01, // Usage Page Generic Desktop
         0x09, 0x39, // Usage Hat Switch
@@ -97,22 +84,12 @@ const USB_Descriptor_HIDReport_Datatype_t PROGMEM JoystickReport[] =
         0xa1, 0x00, // Collection Physical
             0x09, 0x30, // Usage X
             0x09, 0x31, // Usage Y
-            0x15, 0x80, // Logical Minimum -128
-            0x25, 0x7f, // Logical Maximum 127
-            0x75, 0x08, // Report Size 8
-            0x95, 0x02, // Report Count 2
-            0x81, 0x82, // Data, Variable, Absolute, Volatile 
-        0xc0, // End Collection
-
-        0x05, 0x01, // Usage Page Generic Desktop
-        0x09, 0x01, // Usage Pointer
-        0xa1, 0x00, // Collection Physical
             0x09, 0x33, // Usage Rx
             0x09, 0x34, // Usage Ry
-            0x15, 0x80, // Logical Minimum -128
+            0x15, 0x80, // Logical Minimum -127
             0x25, 0x7f, // Logical Maximum 127
             0x75, 0x08, // Report Size 8
-            0x95, 0x02, // Report Count 2
+            0x95, 0x04, // Report Count 4
             0x81, 0x82, // Data, Variable, Absolute, Volatile 
         0xc0, // End Collection
 
